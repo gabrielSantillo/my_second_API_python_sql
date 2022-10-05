@@ -25,4 +25,24 @@ def insert_item():
     else:
         return "Sorry, something has gone wrong."
 
+@app.patch('/api/item')
+def update_item_stock():
+    item_id = request.json.get('item_id')
+    item_stock = request.json.get('item_stock')
+    results = run_statement("CALL update_stock_by_item_id(?,?)", [item_id, item_stock])
+    if(type(results) == list):
+        id_stock_json = json.dumps(results, default=str)
+        return id_stock_json
+    else:
+        return "Sorry, something has gone wrong."
+
+@app.delete('/api/item')
+def delete_item():
+    item_id = request.json.get('item_id')
+    results = run_statement("CALL delete_item_by_id(?)", [item_id])
+    if(type(results) != list):
+        return "Item deleted."
+    else:
+        return "Sorry, something has gone wrong."
+
 app.run(debug=True)
