@@ -6,12 +6,12 @@ import json
 # calling the Flask function which will return a value that I will be used for my API
 app = Flask(__name__)
 
-# making a get request with the /api/item endpoint
 @app.get('/api/item')
 # function that will call the procedure responsible to send back all items
-def get_all_items():
+def get_items_by_limit():
+    limit = request.args.get('limit')
     # calling the procedure
-    results = run_statement("CALL get_all_items()")
+    results = run_statement("CALL get_items_by_limit(?)", [limit])
     # checking to see if the response is a list and if yes, turn this response into a JSON, if not, sent back a message
     if(type(results) == list):
         items_json = json.dumps(results, default=str)
