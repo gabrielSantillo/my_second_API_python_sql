@@ -6,6 +6,19 @@ import json
 # calling the Flask function which will return a value that I will be used for my API
 app = Flask(__name__)
 
+# making a get request with the /api/item endpoint
+@app.get('/api/item')
+# function that will call the procedure responsible to send back all items
+def get_all_items():
+    # calling the procedure
+    results = run_statement("CALL get_all_items()")
+    # checking to see if the response is a list and if yes, turn this response into a JSON, if not, sent back a message
+    if(type(results) == list):
+        items_json = json.dumps(results, default=str)
+        return items_json
+    else:
+        return "Sorry, something has gone wrong."
+
 @app.get('/api/item')
 # function that will call the procedure responsible to send back all items
 def get_items_by_limit():
@@ -42,9 +55,14 @@ def insert_item():
 def update_item_stock():
     # grabbing all data needed to update the stock item
     item_id = request.json.get('item_id')
+    item_name = request.json.get('item_name')
+    item_description = request.json.get('item_description')
     item_stock = request.json.get('item_stock')
+    
+    item = run_statement("CALL get_item_by_id(?)", [item_id])
+    
     # calling the procedure responsible to update the stock
-    results = run_statement("CALL update_stock_by_item_id(?,?)", [item_id, item_stock])
+    results = run_statement("CALL update_stock_by_item_id(?,?,?,?)", [item_id, item_stock, item_name, item_description])
     # checking to see if the response is a list and if yes, turn this response into a JSON, if not, sent back a message
     if(type(results) == list):
         id_stock_json = json.dumps(results, default=str)
